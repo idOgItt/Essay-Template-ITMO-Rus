@@ -24,10 +24,12 @@
 \renewcommand*{\printchaptertitle}{\normalfont\bfseries\centering\MakeUppercase} % Меняем стиль написания для заголовка главы: нормальный размер, полужирный, центрированный, заглавными буквами
 \setbeforesecskip{20pt} % Задаем отступ перед заголовком секции
 \setaftersecskip{20pt} % Ставим такой же отступ после заголовка секции
-\setsecheadstyle{\raggedright\normalfont\bfseries} % Меняем стиль написания для заголовка секции: выравнивание по правому краю без переносов, нормальный размер, полужирный
+\setsecindent{\parindent} % Добавляем абзацный отступ для секции
+\setsecheadstyle{\normalfont\bfseries} % Меняем стиль написания для заголовка секции: по левому краю с красной строки, нормальный размер, полужирный
 \setbeforesubsecskip{20pt} % Задаем отступ перед заголовком подсекции
 \setaftersubsecskip{20pt} % Ставим такой же отступ после заголовка подсекции
-\setsubsecheadstyle{\raggedright\normalfont\bfseries}  % Меняем стиль написания для заголовка подсекции: выравнивание по правому краю без переносов, нормальный размер, полужирный
+\setsubsecindent{\parindent} % Добавляем абзацный отступ для подсекции
+\setsubsecheadstyle{\normalfont\bfseries}  % Меняем стиль написания для заголовка подсекции: по левому краю с красной строки, нормальный размер, полужирный
 
 %%% Задаем параметры оглавления %%%
 
@@ -82,7 +84,7 @@
 \graphicspath{{images/}} % Определяем папку с рисунками
 \captionsetup[figure]{font=small, width=\textwidth, name=Рисунок, justification=centering} % Задаем параметры подписей к рисункам: маленький шрифт (в данном случае 12pt), ширина равна ширине текста, полнотекстовая надпись "Рисунок", выравнивание по центру
 \captionsetup[subfigure]{font=small} % Индексы подрисунков а), б) и так далее тоже шрифтом 12pt (по умолчанию делает еще меньше)
-\captionsetup[table]{singlelinecheck=false,font=small,width=\textwidth,justification=justified} % Задаем параметры подписей к таблицам: запрещаем переносы, маленький шрифт (в данном случае 12pt), ширина равна ширине текста, выравнивание по ширине
+\captionsetup[table]{singlelinecheck=false,font=small,width=\textwidth,justification=raggedright} % Задаем параметры подписей к таблицам: запрещаем переносы, маленький шрифт, выравнивание по левому краю
 \captiondelim{ --- } % Разделителем между номером рисунка/таблицы и текстом в подписи является длинное тире
 \setkeys{Gin}{width=\textwidth} % По умолчанию размер всех добавляемых рисунков будет подгоняться под ширину текста
 \renewcommand{\thesubfigure}{\asbuk{subfigure}} % Нумерация подрисунков строчными буквами кириллицы
@@ -92,7 +94,7 @@
 
 %%% Задаем параметры ссылок и гиперссылок %%% 
 
-\usepackage{hyperref}                               % Подгружаем нужный пакет
+\usepackage{hyperref}                                % Подгружаем нужный пакет
 \hypersetup{
     colorlinks=true,                                % Все ссылки и гиперссылки цветные
     linktoc=all,                                    % В оглавлении ссылки подключатся для всех отображаемых уровней
@@ -158,7 +160,8 @@ isbn=false,                                         % Не показывать 
 }
 
 %%% Прочие пакеты для расширения функционала %%%
-
+\usepackage{amsmath}                                % Усовершенствование отображения математических выражений 
+\usepackage{amssymb}                                % Дополнительные математические символы (включая \mathbb)
 \usepackage{longtable,ltcaption}                    % Длинные таблицы
 \usepackage{multirow,makecell}                      % Улучшенное форматирование таблиц
 \usepackage{booktabs}                               % Еще один пакет для красивых таблиц
@@ -169,23 +172,70 @@ isbn=false,                                         % Не показывать 
 \usepackage[version=4]{mhchem}                      % Красивые химические уравнения
 \usepackage{amsmath}                                % Усовершенствование отображения математических выражений 
 
+%%% Настройка оформления приложений %%%
+\makeatletter
+\renewcommand{\appendix}{
+    \setcounter{chapter}{0}
+    \renewcommand{\thechapter}{\Asbuk{chapter}}
+    \renewcommand{\chaptername}{ПРИЛОЖЕНИЕ}
+    \renewcommand*{\printchaptername}{}
+    \renewcommand*{\printchapternum}{}
+    \renewcommand*{\printchaptertitle}[1]{
+        \begin{flushright}
+            \normalfont\bfseries \chaptername~\thechapter \\
+            \vspace{10pt}
+            ##1
+        \end{flushright}
+    }
+}
+\makeatother
+
 %%% Вставляем по очереди все содержательные части документа %%%
 
 \begin{document}
 
-\input{1_title}                                     % Титульник
+\input{1_title}                                     % Титульный лист (ВКР)
 
-\newpage % Переходим на новую страницу
-\setcounter{page}{2} % Начинаем считать номера страниц со второй
-\OnehalfSpacing* % Задаем полуторный интервал текста (в титульнике одинарный, поэтому команда стоит после него)
+\clearpage 
+\setcounter{page}{2} 
+\OnehalfSpacing* \input{1.1_performers}                              % Список исполнителей
+\clearpage
 
-\tableofcontents*                                   % Автособираемое оглавление
+\input{1.2_abstract}                                % Реферат
+\clearpage
+
+\tableofcontents* % Автособираемое оглавление
+\clearpage
+
+\input{1.3_terms}                                   % Определения, обозначения
+\clearpage
+
+\input{1.4_abbreviations}                           % Сокращения
+\clearpage
 
 \input{2_intro}                                     % Введение
-\input{3_chap1}                                     % Первая глава
-\input{4_chap2}                                     % Вторая глава
-\input{5_chap3}                                     % Третья глава
+\clearpage
 
-\printbibliography[title=Список использованных источников] % Автособираемый список литературы
+\input{3_chap1}                                     % Первая глава (Теоретические основы)
+\clearpage
+
+\input{4_chap2}                                     % Вторая глава (Методология)
+\clearpage
+
+\input{5_chap3}                                     % Третья глава (Реализация и анализ)
+\clearpage
+
+\input{6_conclusion}                                % Заключение
+\clearpage
+
+% Автособираемый список литературы
+\printbibliography[title=СПИСОК ИСПОЛЬЗУЕМЫХ ИСТОЧНИКОВ] 
+\clearpage
+
+\appendix                                           % Переключаем счетчики на приложения
+\input{7_app_A}                                     % Приложение А
+\clearpage
+
+\input{8_app_B}                                     % Приложение Б
 
 \end{document}
